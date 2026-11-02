@@ -43,6 +43,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -317,20 +318,34 @@ fun AiSettingsScreen(
                 OutlinedTextField(
                     value = inputKey,
                     onValueChange = { inputKey = it },
-                    label = { Text("Your Groq API Key") },
-                    placeholder = { Text("Enter your personal Groq API key (gsk_...)") },
+                    label = { Text("Your Groq API Key", color = Color(0xFF334155)) },
+                    placeholder = { Text("Enter your personal Groq API key (gsk_...)", color = Color(0xFF64748B)) },
                     leadingIcon = { Icon(Icons.Default.Lock, contentDescription = null, tint = IndigoPrimary) },
                     trailingIcon = {
                         IconButton(onClick = { passwordVisible = !passwordVisible }) {
                             Icon(
                                 imageVector = if (passwordVisible) Icons.Filled.VisibilityOff else Icons.Filled.Visibility,
-                                contentDescription = if (passwordVisible) "Hide key" else "Show key"
+                                contentDescription = if (passwordVisible) "Hide key" else "Show key",
+                                tint = Color(0xFF475569)
                             )
                         }
                     },
                     visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
                     singleLine = true,
+                    textStyle = MaterialTheme.typography.bodyMedium.copy(color = Color(0xFF0F172A), fontWeight = FontWeight.Medium),
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedTextColor = Color(0xFF0F172A),
+                        unfocusedTextColor = Color(0xFF0F172A),
+                        focusedContainerColor = Color.White,
+                        unfocusedContainerColor = Color(0xFFF8FAFC),
+                        focusedBorderColor = IndigoPrimary,
+                        unfocusedBorderColor = Color(0xFF94A3B8),
+                        focusedLabelColor = IndigoPrimary,
+                        unfocusedLabelColor = Color(0xFF475569),
+                        focusedPlaceholderColor = Color(0xFF64748B),
+                        unfocusedPlaceholderColor = Color(0xFF64748B)
+                    ),
                     modifier = Modifier
                         .fillMaxWidth()
                         .testTag("personal_groq_key_input"),

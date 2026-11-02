@@ -79,6 +79,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -611,7 +612,7 @@ fun GeneratorScreen(
                 }
 
                 // Education Board
-                Text("EDUCATION BOARD *", style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.Bold, color = Color(0xFF64748B)))
+                Text("EDUCATION BOARD *", style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.Bold, color = Color(0xFF334155)))
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.spacedBy(8.dp)
@@ -621,11 +622,26 @@ fun GeneratorScreen(
                         FilterChip(
                             selected = isSelected,
                             onClick = { viewModel.selectedBoard.value = board },
-                            label = { Text(board.shortName, fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal) },
+                            label = {
+                                Text(
+                                    board.shortName,
+                                    fontWeight = if (isSelected) FontWeight.Bold else FontWeight.SemiBold,
+                                    color = if (isSelected) Color.White else Color(0xFF0F172A)
+                                )
+                            },
                             modifier = Modifier
                                 .weight(1f)
                                 .testTag("board_chip_${board.name}"),
+                            border = FilterChipDefaults.filterChipBorder(
+                                enabled = true,
+                                selected = isSelected,
+                                borderColor = if (isSelected) IndigoPrimary else Color(0xFF94A3B8),
+                                selectedBorderColor = IndigoPrimary,
+                                borderWidth = if (isSelected) 1.5.dp else 1.dp
+                            ),
                             colors = FilterChipDefaults.filterChipColors(
+                                containerColor = Color(0xFFF8FAFC),
+                                labelColor = Color(0xFF0F172A),
                                 selectedContainerColor = IndigoPrimary,
                                 selectedLabelColor = Color.White
                             )
@@ -634,7 +650,7 @@ fun GeneratorScreen(
                 }
 
                 // Class / Standard
-                Text("CLASS / STANDARD *", style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.Bold, color = Color(0xFF64748B)))
+                Text("CLASS / STANDARD *", style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.Bold, color = Color(0xFF334155)))
                 ExposedDropdownMenuBox(
                     expanded = classExpanded,
                     onExpandedChange = { classExpanded = it }
@@ -644,6 +660,17 @@ fun GeneratorScreen(
                         onValueChange = {},
                         readOnly = true,
                         trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = classExpanded) },
+                        textStyle = MaterialTheme.typography.bodyMedium.copy(color = Color(0xFF0F172A), fontWeight = FontWeight.SemiBold),
+                        colors = OutlinedTextFieldDefaults.colors(
+                            focusedTextColor = Color(0xFF0F172A),
+                            unfocusedTextColor = Color(0xFF0F172A),
+                            focusedContainerColor = Color.White,
+                            unfocusedContainerColor = Color(0xFFF8FAFC),
+                            focusedBorderColor = IndigoPrimary,
+                            unfocusedBorderColor = Color(0xFF94A3B8),
+                            focusedTrailingIconColor = IndigoPrimary,
+                            unfocusedTrailingIconColor = Color(0xFF334155)
+                        ),
                         modifier = Modifier
                             .fillMaxWidth()
                             .menuAnchor(),
@@ -655,7 +682,13 @@ fun GeneratorScreen(
                     ) {
                         GradeClass.entries.forEach { grade ->
                             DropdownMenuItem(
-                                text = { Text(grade.displayName) },
+                                text = {
+                                    Text(
+                                        grade.displayName,
+                                        color = Color(0xFF0F172A),
+                                        fontWeight = if (grade == selectedClass) FontWeight.Bold else FontWeight.Medium
+                                    )
+                                },
                                 onClick = {
                                     viewModel.selectedClass.value = grade
                                     classExpanded = false
@@ -666,7 +699,7 @@ fun GeneratorScreen(
                 }
 
                 // Subject
-                Text("SUBJECT *", style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.Bold, color = Color(0xFF64748B)))
+                Text("SUBJECT *", style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.Bold, color = Color(0xFF334155)))
                 ExposedDropdownMenuBox(
                     expanded = subjectExpanded,
                     onExpandedChange = { subjectExpanded = it }
@@ -676,6 +709,17 @@ fun GeneratorScreen(
                         onValueChange = {},
                         readOnly = true,
                         trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = subjectExpanded) },
+                        textStyle = MaterialTheme.typography.bodyMedium.copy(color = Color(0xFF0F172A), fontWeight = FontWeight.SemiBold),
+                        colors = OutlinedTextFieldDefaults.colors(
+                            focusedTextColor = Color(0xFF0F172A),
+                            unfocusedTextColor = Color(0xFF0F172A),
+                            focusedContainerColor = Color.White,
+                            unfocusedContainerColor = Color(0xFFF8FAFC),
+                            focusedBorderColor = IndigoPrimary,
+                            unfocusedBorderColor = Color(0xFF94A3B8),
+                            focusedTrailingIconColor = IndigoPrimary,
+                            unfocusedTrailingIconColor = Color(0xFF334155)
+                        ),
                         modifier = Modifier
                             .fillMaxWidth()
                             .menuAnchor(),
@@ -687,7 +731,13 @@ fun GeneratorScreen(
                     ) {
                         standardSubjects.forEach { sub ->
                             DropdownMenuItem(
-                                text = { Text(sub) },
+                                text = {
+                                    Text(
+                                        sub,
+                                        color = Color(0xFF0F172A),
+                                        fontWeight = if (sub == selectedSubject) FontWeight.Bold else FontWeight.Medium
+                                    )
+                                },
                                 onClick = {
                                     viewModel.selectedSubject.value = sub
                                     subjectExpanded = false
@@ -701,15 +751,28 @@ fun GeneratorScreen(
                 OutlinedTextField(
                     value = customSubject,
                     onValueChange = { viewModel.customSubject.value = it },
-                    label = { Text("+ Enter Custom Subject (Optional)") },
-                    placeholder = { Text("e.g. Environmental Science, Economics") },
+                    label = { Text("+ Enter Custom Subject (Optional)", color = Color(0xFF475569)) },
+                    placeholder = { Text("e.g. Environmental Science, Economics", color = Color(0xFF64748B)) },
+                    textStyle = MaterialTheme.typography.bodyMedium.copy(color = Color(0xFF0F172A), fontWeight = FontWeight.Medium),
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedTextColor = Color(0xFF0F172A),
+                        unfocusedTextColor = Color(0xFF0F172A),
+                        focusedContainerColor = Color.White,
+                        unfocusedContainerColor = Color(0xFFF8FAFC),
+                        focusedBorderColor = IndigoPrimary,
+                        unfocusedBorderColor = Color(0xFF94A3B8),
+                        focusedLabelColor = IndigoPrimary,
+                        unfocusedLabelColor = Color(0xFF475569),
+                        focusedPlaceholderColor = Color(0xFF64748B),
+                        unfocusedPlaceholderColor = Color(0xFF64748B)
+                    ),
                     modifier = Modifier.fillMaxWidth(),
                     shape = RoundedCornerShape(10.dp),
                     singleLine = true
                 )
 
                 // Exam Type
-                Text("EXAM TYPE *", style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.Bold, color = Color(0xFF64748B)))
+                Text("EXAM TYPE *", style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.Bold, color = Color(0xFF334155)))
                 FlowRow(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.spacedBy(6.dp),
@@ -720,8 +783,24 @@ fun GeneratorScreen(
                         FilterChip(
                             selected = isSelected,
                             onClick = { viewModel.selectedExamType.value = type },
-                            label = { Text(type.displayName, fontSize = 11.5.sp) },
+                            label = {
+                                Text(
+                                    type.displayName,
+                                    fontSize = 11.5.sp,
+                                    fontWeight = if (isSelected) FontWeight.Bold else FontWeight.SemiBold,
+                                    color = if (isSelected) Color.White else Color(0xFF0F172A)
+                                )
+                            },
+                            border = FilterChipDefaults.filterChipBorder(
+                                enabled = true,
+                                selected = isSelected,
+                                borderColor = if (isSelected) IndigoPrimary else Color(0xFF94A3B8),
+                                selectedBorderColor = IndigoPrimary,
+                                borderWidth = if (isSelected) 1.5.dp else 1.dp
+                            ),
                             colors = FilterChipDefaults.filterChipColors(
+                                containerColor = Color(0xFFF8FAFC),
+                                labelColor = Color(0xFF0F172A),
                                 selectedContainerColor = IndigoPrimary,
                                 selectedLabelColor = Color.White
                             )
@@ -761,7 +840,7 @@ fun GeneratorScreen(
                 }
 
                 // Marks Selector
-                Text("TOTAL MARKS *", style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.Bold, color = Color(0xFF64748B)))
+                Text("TOTAL MARKS *", style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.Bold, color = Color(0xFF334155)))
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -773,9 +852,24 @@ fun GeneratorScreen(
                         FilterChip(
                             selected = isSelected,
                             onClick = { viewModel.selectedMaxMarks.value = marks },
-                            label = { Text("${marks}M", fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium) },
+                            label = {
+                                Text(
+                                    "${marks}M",
+                                    fontWeight = if (isSelected) FontWeight.Bold else FontWeight.SemiBold,
+                                    color = if (isSelected) Color.White else Color(0xFF0F172A)
+                                )
+                            },
                             modifier = Modifier.testTag("marks_chip_$marks"),
+                            border = FilterChipDefaults.filterChipBorder(
+                                enabled = true,
+                                selected = isSelected,
+                                borderColor = if (isSelected) IndigoPrimary else Color(0xFF94A3B8),
+                                selectedBorderColor = IndigoPrimary,
+                                borderWidth = if (isSelected) 1.5.dp else 1.dp
+                            ),
                             colors = FilterChipDefaults.filterChipColors(
+                                containerColor = Color(0xFFF8FAFC),
+                                labelColor = Color(0xFF0F172A),
                                 selectedContainerColor = IndigoPrimary,
                                 selectedLabelColor = Color.White
                             )
@@ -784,7 +878,7 @@ fun GeneratorScreen(
                 }
 
                 // Difficulty Level (Easy, Moderate, Difficult, Mixed)
-                Text("DIFFICULTY LEVEL *", style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.Bold, color = Color(0xFF64748B)))
+                Text("DIFFICULTY LEVEL *", style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.Bold, color = Color(0xFF334155)))
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.spacedBy(6.dp)
@@ -798,11 +892,21 @@ fun GeneratorScreen(
                                 Text(
                                     text = if (diff == Difficulty.MIXED) "Mixed (Recommended)" else diff.displayName,
                                     fontSize = 11.5.sp,
-                                    fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal
+                                    fontWeight = if (isSelected) FontWeight.Bold else FontWeight.SemiBold,
+                                    color = if (isSelected) Color.White else Color(0xFF0F172A)
                                 )
                             },
                             modifier = Modifier.weight(1f),
+                            border = FilterChipDefaults.filterChipBorder(
+                                enabled = true,
+                                selected = isSelected,
+                                borderColor = if (isSelected) PurpleAccent else Color(0xFF94A3B8),
+                                selectedBorderColor = PurpleAccent,
+                                borderWidth = if (isSelected) 1.5.dp else 1.dp
+                            ),
                             colors = FilterChipDefaults.filterChipColors(
+                                containerColor = Color(0xFFF8FAFC),
+                                labelColor = Color(0xFF0F172A),
                                 selectedContainerColor = PurpleAccent,
                                 selectedLabelColor = Color.White
                             )
@@ -811,7 +915,7 @@ fun GeneratorScreen(
                 }
 
                 // Question Types Included (Assertion & reasoning, Numerical, Diagram, etc.)
-                Text("QUESTION TYPES INCLUDED *", style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.Bold, color = Color(0xFF64748B)))
+                Text("QUESTION TYPES INCLUDED *", style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.Bold, color = Color(0xFF334155)))
                 FlowRow(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.spacedBy(6.dp),
@@ -831,8 +935,24 @@ fun GeneratorScreen(
                         FilterChip(
                             selected = isSelected,
                             onClick = { viewModel.toggleQuestionType(type) },
-                            label = { Text(type.displayName, fontSize = 11.sp) },
+                            label = {
+                                Text(
+                                    type.displayName,
+                                    fontSize = 11.sp,
+                                    fontWeight = if (isSelected) FontWeight.Bold else FontWeight.SemiBold,
+                                    color = if (isSelected) Color.White else Color(0xFF0F172A)
+                                )
+                            },
+                            border = FilterChipDefaults.filterChipBorder(
+                                enabled = true,
+                                selected = isSelected,
+                                borderColor = if (isSelected) IndigoPrimary else Color(0xFF94A3B8),
+                                selectedBorderColor = IndigoPrimary,
+                                borderWidth = if (isSelected) 1.5.dp else 1.dp
+                            ),
                             colors = FilterChipDefaults.filterChipColors(
+                                containerColor = Color(0xFFF8FAFC),
+                                labelColor = Color(0xFF0F172A),
                                 selectedContainerColor = IndigoPrimary,
                                 selectedLabelColor = Color.White
                             )
@@ -841,7 +961,7 @@ fun GeneratorScreen(
                 }
 
                 // Assessment Features & Solutions Checkboxes
-                Text("ASSESSMENT FEATURES & SOLUTIONS", style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.Bold, color = Color(0xFF64748B)))
+                Text("ASSESSMENT FEATURES & SOLUTIONS", style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.Bold, color = Color(0xFF334155)))
                 Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
                     CheckboxRow("Include Internal Choice (\"OR\" questions)", includeInternalChoice) { includeInternalChoice = it }
                     CheckboxRow("Include Competency & Case-Based", includeCompetency) { includeCompetency = it }
@@ -853,8 +973,21 @@ fun GeneratorScreen(
                 OutlinedTextField(
                     value = schoolName,
                     onValueChange = { viewModel.schoolName.value = it },
-                    label = { Text("School / Institute Name (Optional)") },
-                    placeholder = { Text("e.g. St. Xavier's Senior Secondary School") },
+                    label = { Text("School / Institute Name (Optional)", color = Color(0xFF475569)) },
+                    placeholder = { Text("e.g. St. Xavier's Senior Secondary School", color = Color(0xFF64748B)) },
+                    textStyle = MaterialTheme.typography.bodyMedium.copy(color = Color(0xFF0F172A), fontWeight = FontWeight.Medium),
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedTextColor = Color(0xFF0F172A),
+                        unfocusedTextColor = Color(0xFF0F172A),
+                        focusedContainerColor = Color.White,
+                        unfocusedContainerColor = Color(0xFFF8FAFC),
+                        focusedBorderColor = IndigoPrimary,
+                        unfocusedBorderColor = Color(0xFF94A3B8),
+                        focusedLabelColor = IndigoPrimary,
+                        unfocusedLabelColor = Color(0xFF475569),
+                        focusedPlaceholderColor = Color(0xFF64748B),
+                        unfocusedPlaceholderColor = Color(0xFF64748B)
+                    ),
                     modifier = Modifier.fillMaxWidth(),
                     shape = RoundedCornerShape(10.dp)
                 )
@@ -862,8 +995,21 @@ fun GeneratorScreen(
                 OutlinedTextField(
                     value = examTitleHeading,
                     onValueChange = { examTitleHeading = it },
-                    label = { Text("Exam Title / Heading (Optional)") },
-                    placeholder = { Text("e.g. Annual Board Practice Examination 2026") },
+                    label = { Text("Exam Title / Heading (Optional)", color = Color(0xFF475569)) },
+                    placeholder = { Text("e.g. Annual Board Practice Examination 2026", color = Color(0xFF64748B)) },
+                    textStyle = MaterialTheme.typography.bodyMedium.copy(color = Color(0xFF0F172A), fontWeight = FontWeight.Medium),
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedTextColor = Color(0xFF0F172A),
+                        unfocusedTextColor = Color(0xFF0F172A),
+                        focusedContainerColor = Color.White,
+                        unfocusedContainerColor = Color(0xFFF8FAFC),
+                        focusedBorderColor = IndigoPrimary,
+                        unfocusedBorderColor = Color(0xFF94A3B8),
+                        focusedLabelColor = IndigoPrimary,
+                        unfocusedLabelColor = Color(0xFF475569),
+                        focusedPlaceholderColor = Color(0xFF64748B),
+                        unfocusedPlaceholderColor = Color(0xFF64748B)
+                    ),
                     modifier = Modifier.fillMaxWidth(),
                     shape = RoundedCornerShape(10.dp)
                 )
@@ -962,11 +1108,16 @@ fun GeneratorScreen(
                                 viewModel.selectedSubject.value = "Science"
                             },
                             modifier = Modifier.weight(1f),
-                            shape = RoundedCornerShape(8.dp)
+                            shape = RoundedCornerShape(8.dp),
+                            border = BorderStroke(1.dp, Color(0xFF94A3B8)),
+                            colors = ButtonDefaults.outlinedButtonColors(
+                                containerColor = Color(0xFFF8FAFC),
+                                contentColor = NavyDark
+                            )
                         ) {
                             Icon(Icons.Default.Science, contentDescription = null, modifier = Modifier.size(14.dp), tint = IndigoPrimary)
                             Spacer(modifier = Modifier.width(4.dp))
-                            Text("Chemical Reactions", fontSize = 11.sp, color = NavyDark)
+                            Text("Chemical Reactions", fontSize = 11.sp, color = NavyDark, fontWeight = FontWeight.SemiBold)
                         }
 
                         OutlinedButton(
@@ -975,11 +1126,16 @@ fun GeneratorScreen(
                                 viewModel.selectedSubject.value = "Mathematics"
                             },
                             modifier = Modifier.weight(1f),
-                            shape = RoundedCornerShape(8.dp)
+                            shape = RoundedCornerShape(8.dp),
+                            border = BorderStroke(1.dp, Color(0xFF94A3B8)),
+                            colors = ButtonDefaults.outlinedButtonColors(
+                                containerColor = Color(0xFFF8FAFC),
+                                contentColor = NavyDark
+                            )
                         ) {
                             Icon(Icons.Default.Calculate, contentDescription = null, modifier = Modifier.size(14.dp), tint = IndigoPrimary)
                             Spacer(modifier = Modifier.width(4.dp))
-                            Text("Quadratic Equations", fontSize = 11.sp, color = NavyDark)
+                            Text("Quadratic Equations", fontSize = 11.sp, color = NavyDark, fontWeight = FontWeight.SemiBold)
                         }
                     }
                 }

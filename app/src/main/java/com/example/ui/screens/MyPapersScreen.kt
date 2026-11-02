@@ -30,10 +30,12 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Divider
 import androidx.compose.material3.FilterChip
+import androidx.compose.material3.FilterChipDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -130,8 +132,19 @@ fun MyPapersScreen(
         OutlinedTextField(
             value = searchQuery,
             onValueChange = { searchQuery = it },
-            placeholder = { Text("Search by paper title, subject, or school...") },
+            placeholder = { Text("Search by paper title, subject, or school...", color = Color(0xFF64748B)) },
             leadingIcon = { Icon(Icons.Default.Search, contentDescription = null, tint = IndigoPrimary) },
+            textStyle = MaterialTheme.typography.bodyMedium.copy(color = Color(0xFF0F172A), fontWeight = FontWeight.Medium),
+            colors = OutlinedTextFieldDefaults.colors(
+                focusedTextColor = Color(0xFF0F172A),
+                unfocusedTextColor = Color(0xFF0F172A),
+                focusedContainerColor = Color.White,
+                unfocusedContainerColor = Color(0xFFF8FAFC),
+                focusedBorderColor = IndigoPrimary,
+                unfocusedBorderColor = Color(0xFF94A3B8),
+                focusedPlaceholderColor = Color(0xFF64748B),
+                unfocusedPlaceholderColor = Color(0xFF64748B)
+            ),
             modifier = Modifier
                 .fillMaxWidth()
                 .testTag("search_papers_input"),
@@ -144,10 +157,31 @@ fun MyPapersScreen(
             horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             listOf("ALL", "CBSE", "ICSE", "PSEB").forEach { board ->
+                val isSelected = selectedFilterBoard == board
                 FilterChip(
-                    selected = selectedFilterBoard == board,
+                    selected = isSelected,
                     onClick = { selectedFilterBoard = board },
-                    label = { Text(board, fontSize = 12.sp) }
+                    label = {
+                        Text(
+                            board,
+                            fontSize = 12.sp,
+                            fontWeight = if (isSelected) FontWeight.Bold else FontWeight.SemiBold,
+                            color = if (isSelected) Color.White else Color(0xFF0F172A)
+                        )
+                    },
+                    border = FilterChipDefaults.filterChipBorder(
+                        enabled = true,
+                        selected = isSelected,
+                        borderColor = if (isSelected) IndigoPrimary else Color(0xFF94A3B8),
+                        selectedBorderColor = IndigoPrimary,
+                        borderWidth = if (isSelected) 1.5.dp else 1.dp
+                    ),
+                    colors = FilterChipDefaults.filterChipColors(
+                        containerColor = Color(0xFFF8FAFC),
+                        labelColor = Color(0xFF0F172A),
+                        selectedContainerColor = IndigoPrimary,
+                        selectedLabelColor = Color.White
+                    )
                 )
             }
         }

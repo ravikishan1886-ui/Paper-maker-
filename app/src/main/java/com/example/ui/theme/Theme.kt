@@ -45,16 +45,17 @@ private val LightColorScheme = lightColorScheme(
     onBackground = SlateTextPrimary,
     onSurface = SlateTextPrimary,
     surfaceVariant = Color(0xFFF1F5F9),
-    onSurfaceVariant = SlateTextSecondary,
-    outline = SlateBorder,
+    onSurfaceVariant = Color(0xFF1E293B), // Slate 800 for high-contrast visible text & labels
+    outline = Color(0xFF94A3B8), // Slate 400 for clearly defined borders
+    outlineVariant = Color(0xFFCBD5E1),
     error = RoseError,
     errorContainer = RoseContainer
 )
 
 @Composable
 fun MyApplicationTheme(
-    darkTheme: Boolean = isSystemInDarkTheme(),
-    dynamicColor: Boolean = false, // Use our brand palette for cohesive SaaS look
+    darkTheme: Boolean = false, // Enforce crisp high-contrast light SaaS theme
+    dynamicColor: Boolean = false,
     content: @Composable () -> Unit,
 ) {
   val colorScheme = when {
