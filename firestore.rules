@@ -1,0 +1,99 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    function isValidId(id) {
+      return id is string && id.size() > 0 && id.size() <= 128;
+    }
+
+    function incoming() {
+      return request.resource.data;
+    }
+
+    function existing() {
+      return resource.data;
+    }
+
+    function isValidUserProfile(data) {
+      return data.userId is string && data.userId.size() > 0 && data.userId.size() <= 128 &&
+             data.displayName is string && data.displayName.size() >= 1 && data.displayName.size() <= 100 &&
+             data.email is string && data.email.size() >= 3 && data.email.size() <= 200 &&
+             (!('encryptedPersonalApiKey' in data) || (data.encryptedPersonalApiKey is string && data.encryptedPersonalApiKey.size() <= 1000)) &&
+             (!('maskedPersonalApiKey' in data) || (data.maskedPersonalApiKey is string && data.maskedPersonalApiKey.size() <= 100)) &&
+             (!('hasPersonalApiKey' in data) || data.hasPersonalApiKey is bool) &&
+             (!('activeProvider' in data) || (data.activeProvider is string && data.activeProvider.size() <= 50));
+    }
+
+    function isValidQuestionPaper(data) {
+      return data.paperId is string && data.paperId.size() > 0 && data.paperId.size() <= 128 &&
+             data.userId is string && data.userId.size() > 0 && data.userId.size() <= 128 &&
+             data.title is string && data.title.size() > 0 && data.title.size() <= 200 &&
+             data.subject is string && data.subject.size() > 0 && data.subject.size() <= 100 &&
+             data.grade is string && data.grade.size() > 0 && data.grade.size() <= 50 &&
+             (!('topic' in data) || (data.topic is string && data.topic.size() <= 200)) &&
+             data.totalMarks is int && data.totalMarks > 0 && data.totalMarks <= 1000 &&
+             (!('durationMinutes' in data) || (data.durationMinutes is int && data.durationMinutes > 0 && data.durationMinutes <= 1440)) &&
+             (!('difficulty' in data) || (data.difficulty in ['EASY', 'MODERATE', 'DIFFICULT', 'MIXED'])) &&
+             data.sectionsJson is string && data.sectionsJson.size() > 0 && data.sectionsJson.size() <= 500000 &&
+             (!('providerUsed' in data) || (data.providerUsed is string && data.providerUsed.size() <= 50));
+    }
+
+    match /users/{userId} {
+      allow get, list: if isOwner(userId);
+
+      allow create: if isOwner(userId) &&
+                       isValidId(userId) &&
+                       incoming().userId == userId &&
+                       incoming().keys().hasAll(['userId', 'displayName', 'email', 'createdAt']) &&
+                       incoming().keys().hasOnly(['userId', 'displayName', 'email', 'encryptedPersonalApiKey', 'maskedPersonalApiKey', 'hasPersonalApiKey', 'activeProvider', 'createdAt', 'updatedAt']) &&
+                       incoming().createdAt is timestamp &&
+                       (!('updatedAt' in incoming()) || incoming().updatedAt is timestamp) &&
+                       isValidUserProfile(incoming());
+
+      allow update: if isOwner(userId) &&
+                       isValidId(userId) &&
+                       incoming().userId == existing().userId &&
+                       incoming().createdAt == existing().createdAt &&
+                       (!('updatedAt' in incoming()) || incoming().updatedAt is timestamp) &&
+                       isValidUserProfile(incoming()) &&
+                       incoming().diff(existing()).affectedKeys().hasOnly(['displayName', 'email', 'encryptedPersonalApiKey', 'maskedPersonalApiKey', 'hasPersonalApiKey', 'activeProvider', 'updatedAt']);
+
+      allow delete: if isOwner(userId) && isValidId(userId);
+
+      match /papers/{paperId} {
+        allow get, list: if isOwner(userId);
+
+        allow create: if isOwner(userId) &&
+                         isValidId(userId) &&
+                         isValidId(paperId) &&
+                         incoming().userId == userId &&
+                         incoming().paperId == paperId &&
+                         incoming().keys().hasAll(['paperId', 'userId', 'title', 'subject', 'grade', 'totalMarks', 'sectionsJson', 'createdAt']) &&
+                         incoming().keys().hasOnly(['paperId', 'userId', 'title', 'subject', 'grade', 'topic', 'totalMarks', 'durationMinutes', 'difficulty', 'sectionsJson', 'providerUsed', 'createdAt', 'updatedAt']) &&
+                         incoming().createdAt is timestamp &&
+                         (!('updatedAt' in incoming()) || incoming().updatedAt is timestamp) &&
+                         isValidQuestionPaper(incoming());
+
+        allow update: if isOwner(userId) &&
+                         isValidId(userId) &&
+                         isValidId(paperId) &&
+                         incoming().userId == existing().userId &&
+                         incoming().paperId == existing().paperId &&
+                         incoming().createdAt == existing().createdAt &&
+                         (!('updatedAt' in incoming()) || incoming().updatedAt is timestamp) &&
+                         isValidQuestionPaper(incoming()) &&
+                         incoming().diff(existing()).affectedKeys().hasOnly(['title', 'subject', 'grade', 'topic', 'totalMarks', 'durationMinutes', 'difficulty', 'sectionsJson', 'providerUsed', 'updatedAt']);
+
+        allow delete: if isOwner(userId) && isValidId(userId) && isValidId(paperId);
+      }
+    }
+  }
+}

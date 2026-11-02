@@ -1,0 +1,6 @@
+{
+  "name": "PaperGenius AI",
+  "description": "Turn textbook pages into exam-ready question papers with AI-powered question generation, marks distribution, and PDF export.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

@@ -1,0 +1,123 @@
+{
+  "entities": {
+    "UserProfile": {
+      "title": "UserProfile",
+      "description": "User profile with personal Groq API key configuration",
+      "type": "object",
+      "properties": {
+        "userId": {
+          "type": "string",
+          "description": "The Firebase Auth UID of the user"
+        },
+        "displayName": {
+          "type": "string",
+          "description": "Display name of the user"
+        },
+        "email": {
+          "type": "string",
+          "description": "User email address"
+        },
+        "encryptedPersonalApiKey": {
+          "type": "string",
+          "description": "Server/keystore-encrypted personal Groq API key"
+        },
+        "maskedPersonalApiKey": {
+          "type": "string",
+          "description": "Masked display representation of personal Groq API key"
+        },
+        "hasPersonalApiKey": {
+          "type": "boolean",
+          "description": "Whether a personal key is configured"
+        },
+        "activeProvider": {
+          "type": "string",
+          "description": "Currently active provider"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Timestamp when user profile was created"
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Timestamp when user profile was last updated"
+        }
+      },
+      "required": ["userId", "displayName", "email", "createdAt"]
+    },
+    "QuestionPaper": {
+      "title": "QuestionPaper",
+      "description": "AI-generated exam question paper saved under a user account",
+      "type": "object",
+      "properties": {
+        "paperId": {
+          "type": "string",
+          "description": "Unique identifier of the question paper"
+        },
+        "userId": {
+          "type": "string",
+          "description": "Auth UID of the paper owner"
+        },
+        "title": {
+          "type": "string",
+          "description": "Title or examination name"
+        },
+        "subject": {
+          "type": "string",
+          "description": "Subject name"
+        },
+        "grade": {
+          "type": "string",
+          "description": "Target class or grade level"
+        },
+        "topic": {
+          "type": "string",
+          "description": "Syllabus topic or chapter"
+        },
+        "totalMarks": {
+          "type": "integer",
+          "description": "Total marks for the question paper"
+        },
+        "durationMinutes": {
+          "type": "integer",
+          "description": "Exam duration in minutes"
+        },
+        "difficulty": {
+          "type": "string",
+          "enum": ["EASY", "MODERATE", "DIFFICULT", "MIXED"],
+          "description": "Difficulty level"
+        },
+        "sectionsJson": {
+          "type": "string",
+          "description": "Serialized JSON string containing sections, questions, diagrams, and marking scheme"
+        },
+        "providerUsed": {
+          "type": "string",
+          "description": "Provider used to generate paper (default_groq, personal_groq, offline_engine)"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Timestamp when paper was generated"
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Timestamp when paper was last updated"
+        }
+      },
+      "required": ["paperId", "userId", "title", "subject", "grade", "totalMarks", "sectionsJson", "createdAt"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": "UserProfile",
+      "description": "Stores user profile and encrypted Groq API settings"
+    },
+    "/users/{userId}/papers/{paperId}": {
+      "schema": "QuestionPaper",
+      "description": "Stores generated question papers for each user"
+    }
+  }
+}
