@@ -23,10 +23,15 @@ jobs:
           java-version: 17
 
       - name: Setup Android SDK
-        uses: android-actions/setup-android@v3
+        uses: android-actions/setup-android@v4
 
       - name: Accept Android SDK Licenses
-        run: yes | sdkmanager --licenses || true
+        run: |
+          yes | ${ANDROID_HOME:-$ANDROID_SDK_ROOT}/cmdline-tools/latest/bin/sdkmanager --licenses || true
+          yes | sdkmanager --licenses || true
+
+      - name: Make Gradlew Executable
+        run: chmod +x gradlew || true
 
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
@@ -46,7 +51,12 @@ jobs:
           fi
 
       - name: Build Debug APK
-        run: gradle assembleDebug --stacktrace --no-daemon
+        run: |
+          if [ -x ./gradlew ]; then
+            ./gradlew assembleDebug --stacktrace --no-daemon
+          else
+            gradle assembleDebug --stacktrace --no-daemon
+          fi
         env:
           GRADLE_OPTS: "-Dorg.gradle.daemon=false -Dorg.gradle.jvmargs=-Xmx2048m"
 
@@ -56,4 +66,5 @@ jobs:
         with:
           name: app-debug-apk
           path: app/build/outputs/apk/debug/app-debug.apk
+
 
