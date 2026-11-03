@@ -22,13 +22,13 @@ import androidx.compose.material.icons.filled.ContentCopy
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Description
 import androidx.compose.material.icons.filled.Download
-import androidx.compose.material.icons.filled.OpenInNew
+import androidx.compose.material.icons.automirrored.filled.OpenInNew
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.Divider
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.FilterChipDefaults
 import androidx.compose.material3.Icon
@@ -339,7 +339,7 @@ fun PaperHistoryCard(
                 }
             }
 
-            Divider(color = Color(0xFFF1F5F9), thickness = 1.dp)
+            HorizontalDivider(color = Color(0xFFF1F5F9), thickness = 1.dp)
 
             // Action Buttons
             Row(
@@ -348,7 +348,7 @@ fun PaperHistoryCard(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 TextButton(onClick = onOpen) {
-                    Icon(Icons.Default.OpenInNew, contentDescription = null, modifier = Modifier.size(16.dp))
+                    Icon(Icons.AutoMirrored.Filled.OpenInNew, contentDescription = null, modifier = Modifier.size(16.dp))
                     Spacer(modifier = Modifier.width(4.dp))
                     Text("Open & Edit", fontSize = 12.sp)
                 }

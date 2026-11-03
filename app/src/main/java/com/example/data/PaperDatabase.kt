@@ -114,7 +114,7 @@ abstract class PaperDatabase : RoomDatabase() {
                     context.applicationContext,
                     PaperDatabase::class.java,
                     "paper_genius_ai.db"
-                ).fallbackToDestructiveMigration().build()
+                ).fallbackToDestructiveMigration(dropAllTables = true).build()
                 INSTANCE = instance
                 instance
             }

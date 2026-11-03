@@ -37,7 +37,7 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.Divider
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -196,7 +196,7 @@ fun AiSettingsScreen(
                     }
                 }
 
-                Divider(color = Color(0xFFF1F5F9))
+                HorizontalDivider(color = Color(0xFFF1F5F9))
 
                 // Dual Status Breakdown
                 Row(
@@ -488,7 +488,7 @@ fun AiSettingsScreen(
                     style = MaterialTheme.typography.bodySmall.copy(color = Color(0xFF334155))
                 )
 
-                Divider(color = Color(0xFFF1F5F9))
+                HorizontalDivider(color = Color(0xFFF1F5F9))
 
                 Text(
                     text = "Security Guarantee: Your personal API key is encrypted using AES-256-GCM via the Android Keystore. It is never logged, never exposed in plain text, and can be deleted at any time.",

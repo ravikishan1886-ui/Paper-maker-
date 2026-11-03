@@ -40,7 +40,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.Divider
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChip
@@ -343,7 +343,7 @@ fun PaperPreviewScreen(
                     }
 
                     Spacer(modifier = Modifier.height(10.dp))
-                    Divider(color = Color(0xFFE2E8F0), thickness = 1.dp)
+                    HorizontalDivider(color = Color(0xFFE2E8F0), thickness = 1.dp)
                     Spacer(modifier = Modifier.height(8.dp))
 
                     // Time & Max Marks row
@@ -362,7 +362,7 @@ fun PaperPreviewScreen(
                     }
 
                     Spacer(modifier = Modifier.height(8.dp))
-                    Divider(color = Color(0xFFE2E8F0), thickness = 1.dp)
+                    HorizontalDivider(color = Color(0xFFE2E8F0), thickness = 1.dp)
 
                     // General Instructions (Only on question paper)
                     if (!showAnswerKey && currentPaper.generalInstructions.isNotEmpty()) {
@@ -383,7 +383,7 @@ fun PaperPreviewScreen(
                             }
                         }
                         Spacer(modifier = Modifier.height(10.dp))
-                        Divider(color = Color(0xFFE2E8F0), thickness = 1.dp)
+                        HorizontalDivider(color = Color(0xFFE2E8F0), thickness = 1.dp)
                     }
                 }
             }
@@ -483,7 +483,7 @@ fun SectionCard(
                 }
             }
 
-            Divider(color = Color(0xFFF1F5F9))
+            HorizontalDivider(color = Color(0xFFF1F5F9))
 
             // Questions in Section
             section.questions.forEach { q ->
@@ -494,7 +494,7 @@ fun SectionCard(
                     onDelete = { onDeleteQuestion(q.id) },
                     onRegenerate = { onRegenerateQuestion(q) }
                 )
-                Divider(color = Color(0xFFF8FAFC), thickness = 1.dp)
+                HorizontalDivider(color = Color(0xFFF8FAFC), thickness = 1.dp)
             }
 
             // Add question button

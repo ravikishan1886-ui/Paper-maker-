@@ -77,6 +77,7 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.MenuAnchorType
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
@@ -673,7 +674,7 @@ fun GeneratorScreen(
                         ),
                         modifier = Modifier
                             .fillMaxWidth()
-                            .menuAnchor(),
+                            .menuAnchor(MenuAnchorType.PrimaryNotEditable),
                         shape = RoundedCornerShape(10.dp)
                     )
                     ExposedDropdownMenu(
@@ -722,7 +723,7 @@ fun GeneratorScreen(
                         ),
                         modifier = Modifier
                             .fillMaxWidth()
-                            .menuAnchor(),
+                            .menuAnchor(MenuAnchorType.PrimaryNotEditable),
                         shape = RoundedCornerShape(10.dp)
                     )
                     ExposedDropdownMenu(

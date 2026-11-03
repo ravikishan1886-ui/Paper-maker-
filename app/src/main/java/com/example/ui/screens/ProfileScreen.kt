@@ -21,8 +21,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ChevronRight
 import androidx.compose.material.icons.filled.Description
 import androidx.compose.material.icons.filled.Key
-import androidx.compose.material.icons.filled.Lock
-import androidx.compose.material.icons.filled.Logout
+import androidx.compose.material.icons.automirrored.filled.Logout
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.School
 import androidx.compose.material.icons.filled.Security
@@ -30,7 +29,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.Divider
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
@@ -133,7 +132,7 @@ fun ProfileScreen(
                 }
 
                 if (currentUser == null || isDemoMode) {
-                    Divider(color = Color(0xFFF1F5F9))
+                    HorizontalDivider(color = Color(0xFFF1F5F9))
                     Row(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.spacedBy(10.dp)
@@ -241,7 +240,7 @@ fun ProfileScreen(
                     }
                 }
 
-                Divider(color = Color(0xFFF8FAFC))
+                HorizontalDivider(color = Color(0xFFF8FAFC))
 
                 Surface(
                     onClick = { viewModel.setScreen(AppScreen.MY_PAPERS) },
@@ -270,7 +269,7 @@ fun ProfileScreen(
                     }
                 }
 
-                Divider(color = Color(0xFFF8FAFC))
+                HorizontalDivider(color = Color(0xFFF8FAFC))
 
                 Surface(
                     onClick = { viewModel.setScreen(AppScreen.GENERATOR) },
@@ -311,7 +310,7 @@ fun ProfileScreen(
                 shape = RoundedCornerShape(10.dp),
                 colors = ButtonDefaults.outlinedButtonColors(contentColor = Color(0xFFEF4444))
             ) {
-                Icon(Icons.Default.Logout, contentDescription = null, modifier = Modifier.size(18.dp))
+                Icon(Icons.AutoMirrored.Filled.Logout, contentDescription = null, modifier = Modifier.size(18.dp))
                 Spacer(modifier = Modifier.width(6.dp))
                 Text("Log Out of Account")
             }
