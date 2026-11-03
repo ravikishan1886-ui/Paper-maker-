@@ -16,22 +16,27 @@ jobs:
       - name: Checkout source
         uses: actions/checkout@v4
 
-      - name: Set up JDK 17
+      - name: Set up JDK 21
         uses: actions/setup-java@v4
         with:
           distribution: temurin
-          java-version: 17
+          java-version: 21
 
       - name: Setup Android SDK
         uses: android-actions/setup-android@v4
 
-      - name: Accept Android SDK Licenses
+      - name: Accept Android SDK Licenses & Install Platform 36
         run: |
           yes | ${ANDROID_HOME:-$ANDROID_SDK_ROOT}/cmdline-tools/latest/bin/sdkmanager --licenses || true
           yes | sdkmanager --licenses || true
+          ${ANDROID_HOME:-$ANDROID_SDK_ROOT}/cmdline-tools/latest/bin/sdkmanager "platforms;android-36" || true
 
-      - name: Make Gradlew Executable
-        run: chmod +x gradlew || true
+      - name: Normalize Line Endings and Permissions for Gradlew
+        run: |
+          if [ -f gradlew ]; then
+            sed -i 's/\r$//' gradlew || true
+            chmod +x gradlew || true
+          fi
 
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
@@ -66,13 +71,35 @@ jobs:
           "package_name": "com.aistudio.papergenius.qgen"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "995356758986-06n60bub4ugdm8o81cagu8emj0rqp89c.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.aistudio.papergenius.qgen",
+            "certificate_hash": "0db9309e67fad9ba3a45de200e72d42e2dc1329f"
+          }
+        },
+        {
+          "client_id": "995356758986-gj5v0ev7rbvuk5ub3516tnp06id9fq3o.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyD258KCA9nd0kzog3f9vJOZ2DLUS_D1bxg"
         }
       ],
-      "services": {}
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "995356758986-gj5v0ev7rbvuk5ub3516tnp06id9fq3o.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
     }
   ],
   "configuration_version": "1"
@@ -83,12 +110,12 @@ EOF
       - name: Build Debug APK
         run: |
           if [ -x ./gradlew ]; then
-            ./gradlew assembleDebug --stacktrace --no-daemon -Djava.awt.headless=true -Dksp.incremental=false
+            ./gradlew assembleDebug --stacktrace --no-daemon -Djava.awt.headless=true -Dksp.incremental=false --max-workers=2 || gradle assembleDebug --stacktrace --no-daemon -Djava.awt.headless=true -Dksp.incremental=false --max-workers=2
           else
-            gradle assembleDebug --stacktrace --no-daemon -Djava.awt.headless=true -Dksp.incremental=false
+            gradle assembleDebug --stacktrace --no-daemon -Djava.awt.headless=true -Dksp.incremental=false --max-workers=2
           fi
         env:
-          GRADLE_OPTS: "-Dorg.gradle.daemon=false -Dorg.gradle.jvmargs=\"-Xmx2048m -Djava.awt.headless=true\" -Djava.awt.headless=true"
+          GRADLE_OPTS: "-Dorg.gradle.daemon=false -Djava.awt.headless=true"
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
@@ -97,5 +124,6 @@ EOF
           name: app-debug-apk
           path: app/build/outputs/apk/debug/*.apk
           if-no-files-found: error
+
 
 
