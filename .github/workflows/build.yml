@@ -39,7 +39,7 @@ jobs:
           gradle-version: '9.3.1'
           cache-disabled: false
 
-      - name: Prepare Keystore and Environment
+      - name: Prepare Keystore, Google Services and Environment
         run: |
           if [ -f debug.keystore.base64 ]; then
             base64 -d debug.keystore.base64 > debug.keystore
@@ -49,16 +49,46 @@ jobs:
           if [ ! -f .env ] && [ -f .env.example ]; then
             cp .env.example .env
           fi
+          if [ ! -f app/google-services.json ]; then
+            cat << 'EOF' > app/google-services.json
+{
+  "project_info": {
+    "project_number": "995356758986",
+    "firebase_url": "https://apt-terrain-496609-g7-default-rtdb.firebaseio.com",
+    "project_id": "apt-terrain-496609-g7",
+    "storage_bucket": "apt-terrain-496609-g7.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:995356758986:android:d6fd606decbe444dd07533",
+        "android_client_info": {
+          "package_name": "com.aistudio.papergenius.qgen"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD258KCA9nd0kzog3f9vJOZ2DLUS_D1bxg"
+        }
+      ],
+      "services": {}
+    }
+  ],
+  "configuration_version": "1"
+}
+EOF
+          fi
 
       - name: Build Debug APK
         run: |
           if [ -x ./gradlew ]; then
-            ./gradlew assembleDebug --stacktrace --no-daemon
+            ./gradlew assembleDebug --stacktrace --no-daemon -Djava.awt.headless=true -Dksp.incremental=false
           else
-            gradle assembleDebug --stacktrace --no-daemon
+            gradle assembleDebug --stacktrace --no-daemon -Djava.awt.headless=true -Dksp.incremental=false
           fi
         env:
-          GRADLE_OPTS: "-Dorg.gradle.daemon=false -Dorg.gradle.jvmargs=-Xmx2048m"
+          GRADLE_OPTS: "-Dorg.gradle.daemon=false -Dorg.gradle.jvmargs=\"-Xmx2048m -Djava.awt.headless=true\" -Djava.awt.headless=true"
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
