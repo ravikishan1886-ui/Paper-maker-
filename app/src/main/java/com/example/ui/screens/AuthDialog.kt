@@ -2,7 +2,11 @@ package com.example.ui.screens
 
 import android.app.Activity
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.draw.clip
+import com.example.R
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -77,19 +81,13 @@ fun AuthDialog(
                 horizontalAlignment = Alignment.CenterHorizontally,
                 modifier = Modifier.fillMaxWidth()
             ) {
-                Box(
+                Image(
+                    painter = painterResource(id = R.drawable.app_logo),
+                    contentDescription = "PaperGenius AI",
                     modifier = Modifier
-                        .size(52.dp)
-                        .background(IndigoPrimary.copy(alpha = 0.12f), CircleShape),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.School,
-                        contentDescription = "PaperGenius AI",
-                        tint = IndigoPrimary,
-                        modifier = Modifier.size(28.dp)
-                    )
-                }
+                        .size(54.dp)
+                        .clip(CircleShape)
+                )
 
                 Spacer(modifier = Modifier.height(12.dp))
                 Text(
