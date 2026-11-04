@@ -414,6 +414,23 @@ class PaperGeniusViewModel(application: Application) : AndroidViewModel(applicat
         }
     }
 
+    fun testActivePersonalApiKey(onResult: (Boolean, String) -> Unit) {
+        val uid = currentUser.value?.uid ?: "local_active_user"
+        viewModelScope.launch {
+            val key = groqRepo.getPersonalApiKey(uid)
+            if (key.isBlank()) {
+                onResult(false, "No active Groq API key is currently saved to test.")
+                return@launch
+            }
+            val res = groqRepo.testGroqKey(key)
+            if (res.isSuccess) {
+                onResult(true, res.getOrNull() ?: "Verified")
+            } else {
+                onResult(false, res.exceptionOrNull()?.message ?: "Test failed")
+            }
+        }
+    }
+
     fun removePersonalApiKey() {
         val uid = currentUser.value?.uid ?: "local_active_user"
         viewModelScope.launch {

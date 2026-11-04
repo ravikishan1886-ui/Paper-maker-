@@ -45,6 +45,7 @@ import androidx.compose.material3.Badge
 import androidx.compose.material3.BadgedBox
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
@@ -606,32 +607,53 @@ fun QuickApiKeyDialog(
             }
         },
         confirmButton = {
-            Button(
-                onClick = {
-                    if (keyInput.isNotBlank()) {
-                        isTesting = true
-                        viewModel.savePersonalApiKey(keyInput) { success, msg ->
-                            isTesting = false
-                            isTestSuccess = success
-                            testFeedback = msg
-                            if (success) {
-                                keyInput = ""
+            Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                OutlinedButton(
+                    onClick = {
+                        if (keyInput.isNotBlank()) {
+                            isTesting = true
+                            viewModel.testPersonalApiKey(keyInput) { success, msg ->
+                                isTesting = false
+                                isTestSuccess = success
+                                testFeedback = msg
                             }
                         }
+                    },
+                    enabled = !isTesting && keyInput.isNotBlank(),
+                    shape = RoundedCornerShape(8.dp),
+                    modifier = Modifier.testTag("quick_test_key_button")
+                ) {
+                    Text("Test Key", fontSize = 12.sp)
+                }
+
+                Button(
+                    onClick = {
+                        if (keyInput.isNotBlank()) {
+                            isTesting = true
+                            viewModel.savePersonalApiKey(keyInput) { success, msg ->
+                                isTesting = false
+                                isTestSuccess = success
+                                testFeedback = msg
+                                if (success) {
+                                    keyInput = ""
+                                }
+                            }
+                        }
+                    },
+                    colors = ButtonDefaults.buttonColors(containerColor = IndigoPrimary),
+                    enabled = !isTesting && keyInput.isNotBlank(),
+                    shape = RoundedCornerShape(8.dp),
+                    modifier = Modifier.testTag("quick_save_key_button")
+                ) {
+                    if (isTesting) {
+                        CircularProgressIndicator(modifier = Modifier.size(16.dp), color = Color.White, strokeWidth = 2.dp)
+                        Spacer(modifier = Modifier.width(6.dp))
+                        Text("Verifying...", fontSize = 12.sp)
+                    } else {
+                        Icon(Icons.Default.Save, contentDescription = null, modifier = Modifier.size(16.dp))
+                        Spacer(modifier = Modifier.width(4.dp))
+                        Text("Save & Apply", fontSize = 12.sp)
                     }
-                },
-                colors = ButtonDefaults.buttonColors(containerColor = IndigoPrimary),
-                enabled = !isTesting && keyInput.isNotBlank(),
-                shape = RoundedCornerShape(8.dp)
-            ) {
-                if (isTesting) {
-                    CircularProgressIndicator(modifier = Modifier.size(16.dp), color = Color.White, strokeWidth = 2.dp)
-                    Spacer(modifier = Modifier.width(6.dp))
-                    Text("Verifying...")
-                } else {
-                    Icon(Icons.Default.Save, contentDescription = null, modifier = Modifier.size(16.dp))
-                    Spacer(modifier = Modifier.width(4.dp))
-                    Text("Save & Apply")
                 }
             }
         },

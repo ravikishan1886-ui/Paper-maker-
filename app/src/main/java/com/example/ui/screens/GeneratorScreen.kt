@@ -60,6 +60,7 @@ import androidx.compose.material.icons.filled.Translate
 import androidx.compose.material.icons.filled.Upload
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
+import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
@@ -142,6 +143,7 @@ fun GeneratorScreen(
     val generationStatus by viewModel.generationStatus.collectAsState()
     val providerStatus by viewModel.providerStatus.collectAsState()
     val selectedTypes by viewModel.selectedQuestionTypes.collectAsState()
+    val userMessage by viewModel.userMessage.collectAsState()
 
     // Form options
     var includeInternalChoice by remember { mutableStateOf(true) }
@@ -1230,6 +1232,53 @@ fun GeneratorScreen(
                     text = "Guaranteed arithmetic symmetry: sum of all section marks equals exactly $selectedMaxMarks marks.",
                     style = MaterialTheme.typography.bodySmall.copy(fontSize = 11.sp, color = Color(0xFF64748B))
                 )
+            }
+        }
+
+        // Feedback or error message banner
+        AnimatedVisibility(visible = !userMessage.isNullOrBlank()) {
+            val isError = userMessage?.contains("Error", ignoreCase = true) == true ||
+                    userMessage?.contains("401") == true ||
+                    userMessage?.contains("429") == true ||
+                    userMessage?.contains("failed", ignoreCase = true) == true
+
+            Surface(
+                shape = RoundedCornerShape(10.dp),
+                color = if (isError) Color(0xFFFEF2F2) else EmeraldContainer,
+                border = BorderStroke(1.dp, if (isError) Color(0xFFFECACA) else Color(0xFFA7F3D0)),
+                modifier = Modifier.fillMaxWidth().testTag("generator_user_message_banner")
+            ) {
+                Row(
+                    modifier = Modifier.padding(12.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(10.dp)
+                ) {
+                    Icon(
+                        imageVector = if (isError) Icons.Default.Warning else Icons.Default.CheckCircle,
+                        contentDescription = null,
+                        tint = if (isError) Color(0xFFDC2626) else EmeraldSuccess,
+                        modifier = Modifier.size(20.dp)
+                    )
+                    Text(
+                        text = userMessage ?: "",
+                        style = MaterialTheme.typography.bodySmall.copy(
+                            fontWeight = FontWeight.Medium,
+                            color = if (isError) Color(0xFF991B1B) else Color(0xFF065F46)
+                        ),
+                        modifier = Modifier.weight(1f)
+                    )
+                    IconButton(
+                        onClick = { viewModel.clearUserMessage() },
+                        modifier = Modifier.size(24.dp)
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Close,
+                            contentDescription = "Dismiss",
+                            tint = Color.Gray,
+                            modifier = Modifier.size(16.dp)
+                        )
+                    }
+                }
             }
         }
 

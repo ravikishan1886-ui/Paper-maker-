@@ -33,6 +33,7 @@ import androidx.compose.material.icons.filled.Download
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Print
+import androidx.compose.material.icons.filled.Share
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material3.AlertDialog
@@ -183,9 +184,9 @@ fun PaperPreviewScreen(
                         Button(
                             onClick = {
                                 try {
-                                    PdfExportManager.printOrSavePdf(context, currentPaper, showAnswerKey)
+                                    PdfExportManager.downloadPdf(context, currentPaper, showAnswerKey)
                                 } catch (e: Exception) {
-                                    Toast.makeText(context, "Export error: ${e.message}", Toast.LENGTH_SHORT).show()
+                                    Toast.makeText(context, "Download error: ${e.message}", Toast.LENGTH_SHORT).show()
                                 }
                             },
                             colors = ButtonDefaults.buttonColors(containerColor = IndigoPrimary),
@@ -194,7 +195,19 @@ fun PaperPreviewScreen(
                         ) {
                             Icon(Icons.Default.Download, contentDescription = null, modifier = Modifier.size(16.dp))
                             Spacer(modifier = Modifier.width(6.dp))
-                            Text(if (showAnswerKey) "Download Key PDF" else "Download Paper PDF", fontSize = 12.sp)
+                            Text(if (showAnswerKey) "Download Key PDF" else "Download PDF", fontSize = 12.sp)
+                        }
+
+                        OutlinedButton(
+                            onClick = {
+                                PdfExportManager.sharePdf(context, currentPaper, showAnswerKey)
+                            },
+                            shape = RoundedCornerShape(8.dp),
+                            modifier = Modifier.testTag("share_pdf_button")
+                        ) {
+                            Icon(Icons.Default.Share, contentDescription = null, modifier = Modifier.size(16.dp))
+                            Spacer(modifier = Modifier.width(6.dp))
+                            Text("Share PDF", fontSize = 12.sp)
                         }
 
                         OutlinedButton(
@@ -294,6 +307,30 @@ fun PaperPreviewScreen(
                     modifier = Modifier.padding(18.dp),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
+                    // Personal Watermark Branding Ribbon
+                    Surface(
+                        shape = RoundedCornerShape(6.dp),
+                        color = Color(0xFFF1F5F9),
+                        modifier = Modifier.padding(bottom = 12.dp)
+                    ) {
+                        Row(
+                            modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp),
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(6.dp)
+                        ) {
+                            Icon(Icons.Default.Bookmark, contentDescription = null, tint = IndigoPrimary, modifier = Modifier.size(12.dp))
+                            Text(
+                                text = "PDF WATERMARK: RAVI KISHAN • CREATED WITH PAPER-MAKER",
+                                style = MaterialTheme.typography.labelSmall.copy(
+                                    fontSize = 9.5.sp,
+                                    fontWeight = FontWeight.Bold,
+                                    color = Color(0xFF475569),
+                                    letterSpacing = 0.8.sp
+                                )
+                            )
+                        }
+                    }
+
                     // School Name
                     Text(
                         text = currentPaper.schoolName.uppercase(),

@@ -33,7 +33,7 @@ import java.util.UUID
 
 class GroqRepository(private val context: Context) {
 
-    private val apiService = GroqApiService.create()
+    private val groqClient = GroqClient()
     private val database = PaperDatabase.getDatabase(context)
 
     private val _providerStatus = MutableStateFlow(
@@ -143,27 +143,10 @@ class GroqRepository(private val context: Context) {
     }
 
     suspend fun testGroqKey(plainKey: String): Result<String> {
-        return withContext(Dispatchers.IO) {
-            try {
-                val response = apiService.listModels("Bearer $plainKey")
-                if (response.isSuccessful && response.body()?.data != null) {
-                    Result.success("Connection verified! Found ${response.body()?.data?.size} Groq models.")
-                } else {
-                    val code = response.code()
-                    val errorBody = response.errorBody()?.string() ?: ""
-                    when (code) {
-                        401 -> Result.failure(Exception("Invalid API key (401 Unauthorized). Check your Groq key."))
-                        429 -> Result.failure(Exception("Groq rate limit or quota exceeded (429)."))
-                        else -> Result.failure(Exception("Groq API test failed ($code): $errorBody"))
-                    }
-                }
-            } catch (e: Exception) {
-                Result.failure(Exception("Network error connecting to Groq: ${e.localizedMessage}"))
-            }
-        }
+        return groqClient.testApiKey(plainKey)
     }
 
-    private suspend fun getPersonalApiKey(userId: String): String {
+    suspend fun getPersonalApiKey(userId: String): String {
         return withContext(Dispatchers.IO) {
             val entity = database.apiKeyDao().getApiKey(userId)
                 ?: database.apiKeyDao().getApiKey("local_active_user")
@@ -189,13 +172,18 @@ class GroqRepository(private val context: Context) {
         val defaultKey = getDefaultApiKey()
         val personalKey = getPersonalApiKey(userId)
 
-        var notificationMessage = "Your request is being processed using the default AI service."
+        var notificationMessage: String
         var rawAiResponse: String? = null
 
-        // Step 1: Attempt with Default Groq Key if configured
-        if (defaultKey.isNotBlank()) {
-            val defaultResult = callGroqChat(
-                apiKey = defaultKey,
+        // Determine active key strategy:
+        // When personalKey is configured, prioritize the user's personal Groq key!
+        val primaryKey = if (personalKey.isNotBlank()) personalKey else defaultKey
+        val backupKey = if (personalKey.isNotBlank() && defaultKey.isNotBlank()) defaultKey else ""
+        val isUsingPersonal = (primaryKey == personalKey)
+
+        if (primaryKey.isNotBlank()) {
+            val primaryResult = callGroqChat(
+                apiKey = primaryKey,
                 board = board,
                 className = className,
                 subject = subject,
@@ -207,55 +195,51 @@ class GroqRepository(private val context: Context) {
                 customTopics = customTopics
             )
 
-            if (defaultResult.isSuccess) {
-                rawAiResponse = defaultResult.getOrNull()
+            if (primaryResult.isSuccess) {
+                rawAiResponse = primaryResult.getOrNull()
                 _providerStatus.value = _providerStatus.value.copy(
-                    activeMode = ProviderMode.DEFAULT_GROQ,
-                    statusMessage = "Generated with default Groq AI service."
+                    activeMode = if (isUsingPersonal) ProviderMode.PERSONAL_GROQ else ProviderMode.DEFAULT_GROQ,
+                    personalKeyWorking = isUsingPersonal,
+                    defaultKeyWorking = !isUsingPersonal,
+                    statusMessage = if (isUsingPersonal) "Active & Verified: Personal Groq Key" else "Active: Default Groq AI Service"
                 )
+                notificationMessage = if (isUsingPersonal)
+                    "Question paper generated using your Personal Groq API key (Llama 3.3)!"
+                else
+                    "Question paper generated using default Groq AI service."
             } else {
-                val error = defaultResult.exceptionOrNull()
-                val isRateLimit = error?.message?.contains("429") == true || error?.message?.contains("quota") == true
-                if (isRateLimit || error?.message?.contains("401") == true) {
-                    notificationMessage = "Default AI usage limit reached. Switching to your personal Groq API key."
-                    _providerStatus.value = _providerStatus.value.copy(
-                        statusMessage = notificationMessage
+                val err = primaryResult.exceptionOrNull()?.message ?: "AI request error"
+
+                // If primary key was personal and backup default exists, try backup
+                if (backupKey.isNotBlank()) {
+                    val backupResult = callGroqChat(
+                        apiKey = backupKey,
+                        board = board,
+                        className = className,
+                        subject = subject,
+                        examType = examType,
+                        maxMarks = maxMarks,
+                        difficulty = difficulty,
+                        blueprint = blueprint,
+                        imageUris = imageUris,
+                        customTopics = customTopics
                     )
+                    if (backupResult.isSuccess) {
+                        rawAiResponse = backupResult.getOrNull()
+                        _providerStatus.value = _providerStatus.value.copy(
+                            activeMode = ProviderMode.DEFAULT_GROQ,
+                            statusMessage = "Generated with default failover service."
+                        )
+                        notificationMessage = "Personal key encountered: $err. Switched to backup Groq service."
+                    } else {
+                        notificationMessage = "$err. Generated via intelligent syllabus engine."
+                    }
+                } else {
+                    notificationMessage = "$err. Generated via intelligent syllabus engine."
                 }
             }
-        }
-
-        // Step 2: Fallback to Personal Groq Key if Default failed or wasn't configured
-        if (rawAiResponse == null && personalKey.isNotBlank()) {
-            notificationMessage = if (defaultKey.isNotBlank())
-                "Default AI usage limit reached. Switching to your personal Groq API key."
-            else
-                "Your request is being processed using your personal Groq API key."
-
-            val personalResult = callGroqChat(
-                apiKey = personalKey,
-                board = board,
-                className = className,
-                subject = subject,
-                examType = examType,
-                maxMarks = maxMarks,
-                difficulty = difficulty,
-                blueprint = blueprint,
-                imageUris = imageUris,
-                customTopics = customTopics
-            )
-
-            if (personalResult.isSuccess) {
-                rawAiResponse = personalResult.getOrNull()
-                _providerStatus.value = _providerStatus.value.copy(
-                    activeMode = ProviderMode.PERSONAL_GROQ,
-                    statusMessage = "Your personal Groq API key is working."
-                )
-            } else {
-                notificationMessage = "Both AI services are temporarily unavailable. Using intelligent syllabus generation."
-            }
-        } else if (rawAiResponse == null && defaultKey.isBlank() && personalKey.isBlank()) {
-            notificationMessage = "Please add your personal Groq API key to continue with cloud generation. Generating via built-in board syllabus engine."
+        } else {
+            notificationMessage = "Please add your personal Groq API key in AI Settings. Generated via syllabus engine."
         }
 
         // Step 3: Parse AI Response or use syllabus question generator
@@ -307,69 +291,30 @@ class GroqRepository(private val context: Context) {
         customTopics: String
     ): Result<String> {
         return withContext(Dispatchers.IO) {
-            try {
-                val hasImages = imageUris.isNotEmpty()
-                val modelName = if (hasImages) "llama-3.2-11b-vision-preview" else "llama-3.3-70b-versatile"
-
-                val prompt = buildPrompt(
-                    board = board,
-                    className = className,
-                    subject = subject,
-                    examType = examType,
-                    maxMarks = maxMarks,
-                    difficulty = difficulty,
-                    blueprint = blueprint,
-                    hasImages = hasImages,
-                    customTopics = customTopics
-                )
-
-                val messageContent: Any = if (hasImages) {
-                    val contentList = mutableListOf<Map<String, Any>>()
-                    contentList.add(mapOf("type" to "text", "text" to prompt))
-
-                    // Encode up to 3 images as base64 data URLs
-                    imageUris.take(3).forEach { uri ->
-                        val base64 = uriToBase64(uri)
-                        if (base64.isNotBlank()) {
-                            contentList.add(
-                                mapOf(
-                                    "type" to "image_url",
-                                    "image_url" to mapOf("url" to "data:image/jpeg;base64,$base64")
-                                )
-                            )
-                        }
-                    }
-                    contentList
-                } else {
-                    prompt
-                }
-
-                val request = GroqChatRequest(
-                    model = modelName,
-                    messages = listOf(
-                        GroqMessage(role = "system", content = "You are PaperGenius AI, an expert exam question paper creator for CBSE, ICSE, and Indian state boards. Respond ONLY in valid raw JSON matching the requested structure without markdown fences."),
-                        GroqMessage(role = "user", content = messageContent)
-                    ),
-                    temperature = 0.2,
-                    max_tokens = 4096
-                )
-
-                val response = apiService.createChatCompletion("Bearer $apiKey", request)
-                if (response.isSuccessful) {
-                    val content = response.body()?.choices?.firstOrNull()?.message?.content
-                    if (!content.isNullOrBlank()) {
-                        Result.success(content)
-                    } else {
-                        Result.failure(Exception("Empty response received from Groq."))
-                    }
-                } else {
-                    val code = response.code()
-                    val errorMsg = response.errorBody()?.string() ?: "HTTP $code"
-                    Result.failure(Exception("Groq error ($code): $errorMsg"))
-                }
-            } catch (e: Exception) {
-                Result.failure(e)
+            val base64Images = imageUris.take(3).mapNotNull { uri ->
+                val b64 = uriToBase64(uri)
+                if (b64.isNotBlank()) b64 else null
             }
+
+            val systemPrompt = "You are PaperGenius AI, an expert exam question paper creator for CBSE, ICSE, and Indian state boards. Respond ONLY in valid JSON matching the requested structure without markdown fences."
+            val userPrompt = buildPrompt(
+                board = board,
+                className = className,
+                subject = subject,
+                examType = examType,
+                maxMarks = maxMarks,
+                difficulty = difficulty,
+                blueprint = blueprint,
+                hasImages = base64Images.isNotEmpty(),
+                customTopics = customTopics
+            )
+
+            groqClient.createChatCompletion(
+                apiKey = apiKey,
+                systemPrompt = systemPrompt,
+                userPrompt = userPrompt,
+                base64Images = base64Images
+            )
         }
     }
 

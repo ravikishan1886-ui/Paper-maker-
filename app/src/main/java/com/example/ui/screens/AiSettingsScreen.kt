@@ -296,7 +296,25 @@ fun AiSettingsScreen(
                                 )
                             }
 
-                            Row {
+                            Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                                OutlinedButton(
+                                    onClick = {
+                                        isTestingConnection = true
+                                        testFeedback = null
+                                        viewModel.testActivePersonalApiKey { success, msg ->
+                                            isTestingConnection = false
+                                            isTestSuccess = success
+                                            testFeedback = msg
+                                        }
+                                    },
+                                    enabled = !isTestingConnection,
+                                    modifier = Modifier.testTag("test_active_key_button")
+                                ) {
+                                    Icon(Icons.Default.NetworkCheck, contentDescription = null, modifier = Modifier.size(16.dp))
+                                    Spacer(modifier = Modifier.width(4.dp))
+                                    Text("Test Key", fontSize = 12.sp)
+                                }
+
                                 OutlinedButton(
                                     onClick = {
                                         viewModel.removePersonalApiKey()
@@ -307,7 +325,7 @@ fun AiSettingsScreen(
                                 ) {
                                     Icon(Icons.Default.Delete, contentDescription = null, modifier = Modifier.size(16.dp))
                                     Spacer(modifier = Modifier.width(4.dp))
-                                    Text("Remove", fontSize = 12.sp)
+                                    Text("Delete", fontSize = 12.sp)
                                 }
                             }
                         }
