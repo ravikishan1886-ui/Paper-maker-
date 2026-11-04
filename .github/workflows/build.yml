@@ -54,56 +54,7 @@ jobs:
 
           # 3. Setup app/google-services.json
           if [ ! -f app/google-services.json ]; then
-            cat << 'EOF' > app/google-services.json
-{
-  "project_info": {
-    "project_number": "995356758986",
-    "firebase_url": "https://apt-terrain-496609-g7-default-rtdb.firebaseio.com",
-    "project_id": "apt-terrain-496609-g7",
-    "storage_bucket": "apt-terrain-496609-g7.firebasestorage.app"
-  },
-  "client": [
-    {
-      "client_info": {
-        "mobilesdk_app_id": "1:995356758986:android:d6fd606decbe444dd07533",
-        "android_client_info": {
-          "package_name": "com.aistudio.papergenius.qgen"
-        }
-      },
-      "oauth_client": [
-        {
-          "client_id": "995356758986-06n60bub4ugdm8o81cagu8emj0rqp89c.apps.googleusercontent.com",
-          "client_type": 1,
-          "android_info": {
-            "package_name": "com.aistudio.papergenius.qgen",
-            "certificate_hash": "0db9309e67fad9ba3a45de200e72d42e2dc1329f"
-          }
-        },
-        {
-          "client_id": "995356758986-gj5v0ev7rbvuk5ub3516tnp06id9fq3o.apps.googleusercontent.com",
-          "client_type": 3
-        }
-      ],
-      "api_key": [
-        {
-          "current_key": "AIzaSyD258KCA9nd0kzog3f9vJOZ2DLUS_D1bxg"
-        }
-      ],
-      "services": {
-        "appinvite_service": {
-          "other_platform_oauth_client": [
-            {
-              "client_id": "995356758986-gj5v0ev7rbvuk5ub3516tnp06id9fq3o.apps.googleusercontent.com",
-              "client_type": 3
-            }
-          ]
-        }
-      }
-    }
-  ],
-  "configuration_version": "1"
-}
-EOF
+            echo "ewogICJwcm9qZWN0X2luZm8iOiB7CiAgICAicHJvamVjdF9udW1iZXIiOiAiOTk1MzU2NzU4OTg2IiwKICAgICJmaXJlYmFzZV91cmwiOiAiaHR0cHM6Ly9hcHQtdGVycmFpbi00OTY2MDktZzctZGVmYXVsdC1ydGRiLmZpcmViYXNlaW8uY29tIiwKICAgICJwcm9qZWN0X2lkIjogImFwdC10ZXJyYWluLTQ5NjYwOS1nNyIsCiAgICAic3RvcmFnZV9idWNrZXQiOiAiYXB0LXRlcnJhaW4tNDk2NjA5LWc3LmZpcmViYXNlc3RvcmFnZS5hcHAiCiAgfSwKICAiY2xpZW50IjogWwogICAgewogICAgICAiY2xpZW50X2luZm8iOiB7CiAgICAgICAgIm1vYmlsZXNka19hcHBfaWQiOiAiMTo5OTUzNTY3NTg5ODY6YW5kcm9pZDpkNmZkNjA2ZGVjYmU0NDRkZDA3NTMzIiwKICAgICAgICAiYW5kcm9pZF9jbGllbnRfaW5mbyI6IHsKICAgICAgICAgICJwYWNrYWdlX25hbWUiOiAiY29tLmFpc3R1ZGlvLnBhcGVyZ2VuaXVzLnFnZW4iCiAgICAgICAgfQogICAgICB9LAogICAgICAib2F1dGhfY2xpZW50IjogWwogICAgICAgIHsKICAgICAgICAgICJjbGllbnRfaWQiOiAiOTk1MzU2NzU4OTg2LTA2bjYwYnViNHVnZG04bzgxY2FndThlbWowcnFwODljLmFwcHMuZ29vZ2xldXNlcmNvbnRlbnQuY29tIiwKICAgICAgICAgICJjbGllbnRfdHlwZSI6IDEsCiAgICAgICAgICAiYW5kcm9pZF9pbmZvIjogewogICAgICAgICAgICAicGFja2FnZV9uYW1lIjogImNvbS5haXN0dWRpby5wYXBlcmdlbml1cy5xZ2VuIiwKICAgICAgICAgICAgImNlcnRpZmljYXRlX2hhc2giOiAiMGRiOTMwOWU2N2ZhZDliYTNhNDVkZTIwMGU3MmQ0MmUyZGMxMzI5ZiIKICAgICAgICAgIH0KICAgICAgICB9LAogICAgICAgIHsKICAgICAgICAgICJjbGllbnRfaWQiOiAiOTk1MzU2NzU4OTg2LWdqNXYwZXY3cmJ2dWs1dWIzNTE2dG5wMDZpZDlmcTNvLmFwcHMuZ29vZ2xldXNlcmNvbnRlbnQuY29tIiwKICAgICAgICAgICJjbGllbnRfdHlwZSI6IDMKICAgICAgICB9CiAgICAgIF0sCiAgICAgICJhcGlfa2V5IjogWwogICAgICAgIHsKICAgICAgICAgICJjdXJyZW50X2tleSI6ICJBSXphU3lEMjU4S0NBOW5kMGt6b2czZjl2Sk9aMkRMVVNfRDFieGciCiAgICAgICAgfQogICAgICBdLAogICAgICAic2VydmljZXMiOiB7CiAgICAgICAgImFwcGludml0ZV9zZXJ2aWNlIjogewogICAgICAgICAgIm90aGVyX3BsYXRmb3JtX29hdXRoX2NsaWVudCI6IFsKICAgICAgICAgICAgewogICAgICAgICAgICAgICJjbGllbnRfaWQiOiAiOTk1MzU2NzU4OTg2LWdqNXYwZXY3cmJ2dWs1dWIzNTE2dG5wMDZpZDlmcTNvLmFwcHMuZ29vZ2xldXNlcmNvbnRlbnQuY29tIiwKICAgICAgICAgICAgICAiY2xpZW50X3R5cGUiOiAzCiAgICAgICAgICAgIH0KICAgICAgICAgIF0KICAgICAgICB9CiAgICAgIH0KICAgIH0KICBdLAogICJjb25maWd1cmF0aW9uX3ZlcnNpb24iOiAiMSIKfQ==" | base64 -d > app/google-services.json
           fi
 
           # 4. Enforce headless JVM and non-incremental KSP in gradle.properties
@@ -135,7 +86,3 @@ EOF
           name: app-debug-apk
           path: app/build/outputs/apk/debug/*.apk
           if-no-files-found: error
-
-
-
-
